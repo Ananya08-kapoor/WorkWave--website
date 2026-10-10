@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Oops')}"></head>
+<body>
+<div th:replace="~{fragments :: navbar}"></div>
+<main class="container">
+  <section class="card form-card" style="text-align:center">
+    <h1 class="grad" th:text="${status}">404</h1>
+    <h2>Something went wrong</h2>
+    <p class="muted">The page you were looking for isn't available, or you don't have access to it.</p>
+    <p style="margin-top:1rem"><a class="btn" th:href="@{/}">Back to home</a></p>
+  </section>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

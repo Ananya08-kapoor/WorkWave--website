@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Applicants')}"></head>
+<body>
+<div th:replace="~{fragments :: navbar}"></div>
+<main class="container">
+  <a th:href="@{/employer/dashboard}" class="muted">← Back to dashboard</a>
+  <div class="section-head" style="margin-top:.8rem">
+    <div>
+      <h2>Applicants for <span class="grad" th:text="${job.title}">Job</span></h2>
+      <p class="muted" th:text="${applications.size()} + ' application(s)'">0 applications</p>
+    </div>
+  </div>
+
+  <div class="empty" th:if="${applications.isEmpty()}">No applications yet. Share the job link to attract candidates!</div>
+
+  <article class="card app-card" th:each="a : ${applications}">
+    <div class="app-head">
+      <div class="avatar" th:style="'--hue:' + ${a.candidate.id * 47 % 360}"
+           th:text="${a.candidate.name.substring(0,1).toUpperCase()}">A</div>
+      <div>
+        <h3 style="margin:0" th:text="${a.candidate.name}">Candidate</h3>
+        <p class="muted small" th:text="${a.candidate.headline}">Headline</p>
+      </div>
+      <span class="pill" th:classappend="'pill-' + ${a.status.name().toLowerCase()}" th:text="${a.status.label}">Applied</span>
+    </div>
+    <div class="chips" style="margin-bottom:.8rem">
+      <span class="chip" th:each="s : ${a.candidate.skillList}" th:text="${s}">Skill</span>
+    </div>
+    <p class="pre" th:text="${a.coverLetter}">Cover letter</p>
+    <p class="small" style="margin-top:.6rem">
+      <a th:href="'mailto:' + ${a.candidate.email}" th:text="${a.candidate.email}">email</a>
+      <th:block th:if="${!#strings.isEmpty(a.resumeLink)}">
+        · <a th:href="${a.resumeLink}" target="_blank" rel="noopener noreferrer">View resume ↗</a>
+      </th:block>
+      · <span class="muted" th:text="'Applied ' + ${#temporals.format(a.appliedAt,'dd MMM yyyy')}">date</span>
+    </p>
+    <form class="status-form" th:action="@{/employer/applications/{id}/status(id=${a.id})}" method="post">
+      <select name="status">
+        <option th:each="s : ${statuses}" th:value="${s}" th:text="${s.label}" th:selected="${s == a.status}">Applied</option>
+      </select>
+      <input name="note" maxlength="500" placeholder="Note to candidate (optional)" th:value="${a.employerNote}">
+      <button class="btn btn-sm" type="submit">Update status</button>
+    </form>
+  </article>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

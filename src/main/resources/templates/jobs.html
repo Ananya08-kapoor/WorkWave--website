@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Find jobs')}"></head>
+<body>
+<div th:replace="~{fragments :: navbar}"></div>
+<main class="container">
+  <h2>Find your next job</h2>
+  <form class="search-bar" th:action="@{/jobs}" method="get" style="margin:1rem 0 1.6rem;max-width:none">
+    <input name="keyword" placeholder="Title, skill or company" th:value="${keyword}">
+    <input name="location" placeholder="Location" th:value="${location}">
+    <select name="type">
+      <option value="">Any type</option>
+      <option th:each="t : ${types}" th:value="${t}" th:text="${t.label}"
+              th:selected="${type != null and type == t}">Full-time</option>
+    </select>
+    <button class="btn" type="submit">Search</button>
+    <a class="btn btn-ghost" th:href="@{/jobs}">Reset</a>
+  </form>
+
+  <p class="muted" th:text="${jobs.size()} + ' job(s) found'">0 jobs found</p>
+  <div class="empty" th:if="${jobs.isEmpty()}">😕 No jobs match your search. Try different keywords.</div>
+  <div class="grid" style="margin-top:1rem">
+    <th:block th:each="job : ${jobs}">
+      <article th:replace="~{fragments :: jobCard(${job})}"></article>
+    </th:block>
+  </div>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

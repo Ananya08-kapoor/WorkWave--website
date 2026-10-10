@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Post a job')}"></head>
+<body>
+<div th:replace="~{fragments :: navbar}"></div>
+<main class="container">
+  <section class="card form-card wide">
+    <h2>Post a new vacancy</h2>
+    <p class="muted" style="margin-bottom:1rem">An admin will review it before it appears on the site.</p>
+    <form class="stack" th:action="@{/employer/jobs}" method="post">
+      <label>Job title <input name="title" required maxlength="120" placeholder="e.g. Java Backend Developer"></label>
+      <div class="row">
+        <label>Location <input name="location" required placeholder="City or Remote"></label>
+        <label>Job type
+          <select name="jobType" required>
+            <option th:each="t : ${types}" th:value="${t}" th:text="${t.label}">Full-time</option>
+          </select></label>
+      </div>
+      <div class="row">
+        <label>Salary (optional) <input name="salary" placeholder="₹6–10 LPA"></label>
+        <label>Required skills (comma separated) <input name="skills" placeholder="Java, Spring Boot, SQL"></label>
+      </div>
+      <label>Description
+        <textarea name="description" rows="8" required maxlength="4000"
+                  placeholder="Responsibilities, requirements, perks..."></textarea></label>
+      <div class="actions">
+        <button class="btn btn-lg" type="submit">Submit for approval</button>
+        <a class="btn btn-ghost btn-lg" th:href="@{/employer/dashboard}">Cancel</a>
+      </div>
+    </form>
+  </section>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

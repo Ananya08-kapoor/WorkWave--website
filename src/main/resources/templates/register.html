@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Sign up')}"></head>
+<body>
+<div th:replace="~{fragments :: navbar}"></div>
+<main class="container">
+  <section class="card form-card">
+    <h2>Create your account</h2>
+    <p class="muted" style="margin-bottom:1rem">Join as a job seeker or an employer.</p>
+    <form class="stack" th:action="@{/register}" method="post">
+      <div class="role-pick">
+        <label><input type="radio" name="role" value="JOB_SEEKER" th:checked="${selectedRole == 'JOB_SEEKER'}">🎓 I'm looking for a job</label>
+        <label><input type="radio" name="role" value="EMPLOYER" th:checked="${selectedRole == 'EMPLOYER'}">🏢 I'm hiring</label>
+      </div>
+      <label>Full name <input name="name" required th:value="${name}"></label>
+      <label>Email <input type="email" name="email" required th:value="${email}"></label>
+      <label>Password (min 6 characters) <input type="password" name="password" minlength="6" required></label>
+
+      <label data-role="EMPLOYER">Company name <input name="companyName" placeholder="Acme Pvt Ltd"></label>
+      <label data-role="JOB_SEEKER">Headline <input name="headline" placeholder="e.g. Final-year B.Tech student"></label>
+      <label data-role="JOB_SEEKER">Your skills (comma separated)
+        <input name="skills" placeholder="Java, SQL, Git"></label>
+
+      <button class="btn btn-lg" type="submit">Sign up</button>
+    </form>
+    <p class="muted small" style="margin-top:1rem">Already registered? <a th:href="@{/login}">Log in</a></p>
+  </section>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

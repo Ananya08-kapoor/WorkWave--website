@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Users')}"></head>
+<body>
+<div th:replace="~{fragments :: navbar}"></div>
+<main class="container">
+  <a th:href="@{/admin/dashboard}" class="muted">← Back to admin panel</a>
+  <h2 style="margin-top:.8rem">Registered users</h2>
+  <p class="muted" th:text="${employerCount} + ' employers · ' + ${seekerCount} + ' job seekers'">counts</p>
+  <div class="card table-wrap" style="margin-top:1rem">
+    <table>
+      <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th></tr></thead>
+      <tbody>
+        <tr th:each="u : ${users}">
+          <td th:text="${u.name}">Name</td>
+          <td th:text="${u.email}">Email</td>
+          <td><span class="pill" th:text="${u.role.name().replace('_',' ')}">ROLE</span></td>
+          <td class="muted" th:text="${#temporals.format(u.createdAt,'dd MMM yyyy')}">Date</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

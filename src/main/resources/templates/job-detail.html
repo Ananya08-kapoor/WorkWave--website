@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(${job.title})}"></head>
+<body>
+<div th:replace="~{fragments :: navbar}"></div>
+<main class="container">
+  <a th:href="@{/jobs}" class="muted">← Back to jobs</a>
+  <div class="two-col" style="margin-top:1rem">
+    <section class="card">
+      <div class="job-head" style="margin-bottom:1rem">
+        <div class="avatar" th:style="'--hue:' + ${job.employer.id * 47 % 360}"
+             th:text="${job.companyName.substring(0,1).toUpperCase()}">T</div>
+        <div>
+          <h2 style="margin:0" th:text="${job.title}">Title</h2>
+          <p class="muted" th:text="${job.companyName}">Company</p>
+        </div>
+        <span class="pill" th:if="${job.status.name() != 'APPROVED'}"
+              th:classappend="'pill-' + ${job.status.name().toLowerCase()}"
+              th:text="${job.status.label}" style="margin-left:auto">Status</span>
+      </div>
+      <div class="meta" style="margin-bottom:1rem">
+        <span th:text="'📍 ' + ${job.location}">Location</span>
+        <span th:text="'🕒 ' + ${job.jobType.label}">Type</span>
+        <span th:if="${!#strings.isEmpty(job.salary)}" th:text="'💰 ' + ${job.salary}">Salary</span>
+        <span th:text="'Posted ' + ${#temporals.format(job.postedAt,'dd MMM yyyy')}">Date</span>
+      </div>
+      <h3>About the role</h3>
+      <p class="pre" th:text="${job.description}">Description</p>
+      <h3 style="margin-top:1.4rem">Skills</h3>
+      <div class="chips"><span class="chip" th:each="s : ${job.skillList}" th:text="${s}">Skill</span></div>
+    </section>
+
+    <aside class="card">
+      <th:block th:if="${currentUser == null}">
+        <h3>Interested?</h3>
+        <p class="muted">Log in as a job seeker to apply.</p>
+        <p style="margin-top:1rem"><a class="btn" th:href="@{/login}">Log in to apply</a></p>
+      </th:block>
+
+      <th:block th:if="${currentUser != null and currentUser.role.name() == 'JOB_SEEKER'}">
+        <div th:if="${match != null}" class="match" style="margin:0 0 1rem;display:inline-block"
+             th:text="${match} + '% skill match'">80% match</div>
+        <div th:if="${alreadyApplied}">
+          <h3>✅ Application sent</h3>
+          <p class="muted">Track it from your dashboard.</p>
+          <p style="margin-top:1rem"><a class="btn btn-ghost" th:href="@{/seeker/dashboard}">View status</a></p>
+        </div>
+        <div th:if="${!alreadyApplied and job.status.name() == 'APPROVED'}">
+          <h3>Apply for this job</h3>
+          <form class="stack" th:action="@{/seeker/jobs/{id}/apply(id=${job.id})}" method="post" style="margin-top:.8rem">
+            <label>Cover letter
+              <textarea name="coverLetter" rows="5" required maxlength="2000"
+                        placeholder="Why are you a great fit?"></textarea></label>
+            <label>Resume / portfolio link
+              <input type="url" name="resumeLink" placeholder="https://drive.google.com/..."></label>
+            <button class="btn btn-lg" type="submit">Apply now</button>
+          </form>
+        </div>
+      </th:block>
+
+      <th:block th:if="${currentUser != null and currentUser.role.name() != 'JOB_SEEKER'}">
+        <h3>Preview mode</h3>
+        <p class="muted">Only job seekers can apply.</p>
+      </th:block>
+    </aside>
+  </div>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

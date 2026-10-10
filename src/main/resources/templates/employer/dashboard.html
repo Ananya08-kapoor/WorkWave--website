@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Employer dashboard')}"></head>
+<body>
+<div th:replace="~{fragments :: navbar}"></div>
+<main class="container">
+  <div class="section-head" style="margin-top:0">
+    <div>
+      <h2>Hello, <span class="grad" th:text="${currentUser.companyName}">Company</span></h2>
+      <p class="muted">Manage vacancies and review candidates.</p>
+    </div>
+    <a class="btn" th:href="@{/employer/jobs/new}">＋ Post a job</a>
+  </div>
+
+  <div class="grid-4">
+    <div class="card stat-card"><span class="muted">Total postings</span><b th:text="${totalJobs}">0</b></div>
+    <div class="card stat-card"><span class="muted">Live</span><b th:text="${liveJobs}">0</b></div>
+    <div class="card stat-card"><span class="muted">Awaiting approval</span><b th:text="${pendingJobs}">0</b></div>
+    <div class="card stat-card"><span class="muted">Applicants</span><b th:text="${totalApplicants}">0</b></div>
+  </div>
+
+  <div class="empty" th:if="${jobs.isEmpty()}">You haven't posted any jobs yet. Start with your first vacancy!</div>
+  <div class="card table-wrap" th:if="${!jobs.isEmpty()}">
+    <table>
+      <thead><tr><th>Job</th><th>Status</th><th>Applicants</th><th>Actions</th></tr></thead>
+      <tbody>
+        <tr th:each="j : ${jobs}">
+          <td>
+            <a th:href="@{/jobs/{id}(id=${j.id})}" th:text="${j.title}"><b>Title</b></a>
+            <div class="muted small" th:text="${j.location} + ' · ' + ${j.jobType.label}">Location</div>
+            <div class="small" style="color:var(--bad)"
+                 th:if="${!#strings.isEmpty(j.adminRemark)}" th:text="'Admin note: ' + ${j.adminRemark}"></div>
+          </td>
+          <td><span class="pill" th:classappend="'pill-' + ${j.status.name().toLowerCase()}" th:text="${j.status.label}">Status</span></td>
+          <td th:text="${counts.get(j.id)}">0</td>
+          <td class="actions">
+            <a class="btn btn-sm" th:href="@{/employer/jobs/{id}/applications(id=${j.id})}">Review applicants</a>
+            <form class="inline" th:if="${j.status.name() == 'APPROVED'}"
+                  th:action="@{/employer/jobs/{id}/close(id=${j.id})}" method="post">
+              <button class="btn btn-ghost btn-sm" type="submit">Close</button>
+            </form>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

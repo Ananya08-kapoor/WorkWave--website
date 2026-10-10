@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('My applications')}"></head>
+<body>
+<div th:replace="~{fragments :: navbar}"></div>
+<main class="container">
+  <div class="section-head" style="margin-top:0">
+    <div><h2>Hi <span class="grad" th:text="${me.name}">there</span> 👋</h2><p class="muted">Track every application in one place.</p></div>
+    <a class="btn" th:href="@{/jobs}">🔍 Find more jobs</a>
+  </div>
+
+  <div class="grid-4">
+    <div class="card stat-card"><span class="muted">Applied</span><b th:text="${total}">0</b></div>
+    <div class="card stat-card"><span class="muted">Under review</span><b th:text="${inReview}">0</b></div>
+    <div class="card stat-card"><span class="muted">Shortlisted</span><b th:text="${shortlisted}">0</b></div>
+    <div class="card stat-card"><span class="muted">Hired</span><b th:text="${hired}">0</b></div>
+  </div>
+
+  <div class="two-col">
+    <section>
+      <h2>Applications</h2>
+      <div class="empty" style="margin-top:1rem" th:if="${applications.isEmpty()}">
+        You haven't applied yet. <a th:href="@{/jobs}">Browse jobs</a> and send your first application!
+      </div>
+      <article class="card app-card" style="margin-top:1rem" th:each="a : ${applications}">
+        <div class="app-head">
+          <div class="avatar" th:style="'--hue:' + ${a.job.employer.id * 47 % 360}"
+               th:text="${a.job.companyName.substring(0,1).toUpperCase()}">T</div>
+          <div>
+            <h3 style="margin:0"><a th:href="@{/jobs/{id}(id=${a.job.id})}" th:text="${a.job.title}">Title</a></h3>
+            <p class="muted small" th:text="${a.job.companyName} + ' · ' + ${a.job.location}">Company</p>
+          </div>
+          <span class="pill" th:classappend="'pill-' + ${a.status.name().toLowerCase()}" th:text="${a.status.label}">Applied</span>
+        </div>
+        <ol class="stepper" th:classappend="${a.status.name() == 'REJECTED'} ? 'is-rejected'">
+          <li th:each="s : ${steps}"
+              th:classappend="${a.status.name() != 'REJECTED' and a.status.ordinal() >= s.ordinal()} ? 'done'">
+            <span class="dot"></span><span th:text="${s.label}">Step</span>
+          </li>
+        </ol>
+        <p class="note" th:if="${!#strings.isEmpty(a.employerNote)}" th:text="'💬 ' + ${a.employerNote}">Note</p>
+        <p class="muted small" style="margin-top:.6rem"
+           th:text="'Applied ' + ${#temporals.format(a.appliedAt,'dd MMM yyyy')} + ' · Updated ' + ${#temporals.format(a.updatedAt,'dd MMM yyyy')}">dates</p>
+      </article>
+    </section>
+
+    <aside class="card">
+      <h3>My profile</h3>
+      <p class="muted small" style="margin-bottom:.8rem">Your skills power the “% match” badge on every job.</p>
+      <form class="stack" th:action="@{/seeker/profile}" method="post">
+        <label>Headline <input name="headline" th:value="${me.headline}" placeholder="e.g. Final-year B.Tech student"></label>
+        <label>Skills (comma separated) <input name="skills" th:value="${me.skills}" placeholder="Java, SQL, Git"></label>
+        <button class="btn" type="submit">Save profile</button>
+      </form>
+    </aside>
+  </div>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

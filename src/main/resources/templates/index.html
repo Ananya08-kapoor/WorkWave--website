@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Find your next role')}"></head>
+<body>
+<div th:replace="~{fragments :: navbar}"></div>
+
+<section class="hero">
+  <div class="blob b1"></div><div class="blob b2"></div>
+  <div class="container hero-inner">
+    <span class="badge">🚀 Recruitment, simplified</span>
+    <h1>Find work you love.<br><span class="grad">Hire people who fit.</span></h1>
+    <p class="lead">Employers post vacancies, admins keep listings trustworthy, and candidates apply in one click, then track every step of their application.</p>
+    <form class="search-bar" th:action="@{/jobs}" method="get">
+      <input name="keyword" placeholder="Job title, skill or company">
+      <input name="location" placeholder="Location">
+      <select name="type">
+        <option value="">Any type</option>
+        <option th:each="t : ${types}" th:value="${t}" th:text="${t.label}">Full-time</option>
+      </select>
+      <button class="btn btn-lg" type="submit">🔍 Search</button>
+    </form>
+    <div class="stats">
+      <div><b th:text="${liveJobs}">0</b><span>Live jobs</span></div>
+      <div><b th:text="${employers}">0</b><span>Employers</span></div>
+      <div><b th:text="${seekers}">0</b><span>Job seekers</span></div>
+    </div>
+  </div>
+</section>
+
+<main class="container">
+  <div class="section-head"><h2>How it works</h2></div>
+  <div class="flow">
+    <div class="step"><h3>Employer posts</h3><p class="muted small">Create a vacancy with skills, salary and location.</p></div>
+    <div class="step"><h3>Admin approves</h3><p class="muted small">Every listing is reviewed before it goes live.</p></div>
+    <div class="step"><h3>Seeker applies</h3><p class="muted small">Search, see your skill-match score, and apply.</p></div>
+    <div class="step"><h3>Employer reviews</h3><p class="muted small">Read applications and shortlist the best fits.</p></div>
+    <div class="step"><h3>Status updates</h3><p class="muted small">Candidates track progress live on their dashboard.</p></div>
+  </div>
+
+  <div class="section-head">
+    <h2>Latest openings</h2>
+    <a class="btn btn-ghost btn-sm" th:href="@{/jobs}">Browse all jobs →</a>
+  </div>
+  <div class="empty" th:if="${jobs.isEmpty()}">No live jobs yet. Check back soon!</div>
+  <div class="grid">
+    <th:block th:each="job : ${jobs}">
+      <article th:replace="~{fragments :: jobCard(${job})}"></article>
+    </th:block>
+  </div>
+</main>
+
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

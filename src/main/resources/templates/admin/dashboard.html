@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Admin panel')}"></head>
+<body>
+<div th:replace="~{fragments :: navbar}"></div>
+<main class="container">
+  <div class="section-head" style="margin-top:0">
+    <div><h2>Admin <span class="grad">control room</span></h2><p class="muted">Approve vacancies before they go live.</p></div>
+    <a class="btn btn-ghost" th:href="@{/admin/users}">👥 View users</a>
+  </div>
+
+  <div class="grid-4">
+    <div class="card stat-card"><span class="muted">Pending approval</span><b th:text="${pendingCount}">0</b></div>
+    <div class="card stat-card"><span class="muted">Live jobs</span><b th:text="${liveCount}">0</b></div>
+    <div class="card stat-card"><span class="muted">Users</span><b th:text="${userCount}">0</b></div>
+    <div class="card stat-card"><span class="muted">Applications</span><b th:text="${applicationCount}">0</b></div>
+  </div>
+
+  <h2>Approval queue</h2>
+  <div class="empty" style="margin-top:1rem" th:if="${pending.isEmpty()}">🎉 Nothing waiting. All caught up!</div>
+  <article class="card app-card" style="margin-top:1rem" th:each="j : ${pending}">
+    <div class="app-head">
+      <div class="avatar" th:style="'--hue:' + ${j.employer.id * 47 % 360}"
+           th:text="${j.companyName.substring(0,1).toUpperCase()}">T</div>
+      <div>
+        <h3 style="margin:0"><a th:href="@{/jobs/{id}(id=${j.id})}" th:text="${j.title}">Title</a></h3>
+        <p class="muted small" th:text="${j.companyName} + ' · ' + ${j.location} + ' · ' + ${j.jobType.label}">meta</p>
+      </div>
+    </div>
+    <p class="pre muted" th:text="${#strings.abbreviate(j.description, 220)}">Description</p>
+    <form class="review-form" th:action="@{/admin/jobs/{id}/approve(id=${j.id})}" method="post">
+      <input name="remark" maxlength="200" placeholder="Remark for the employer (optional)">
+      <button class="btn btn-ok btn-sm" type="submit">✔ Approve</button>
+      <button class="btn btn-bad btn-sm" type="submit" th:formaction="@{/admin/jobs/{id}/reject(id=${j.id})}">✖ Reject</button>
+    </form>
+  </article>
+
+  <h2 style="margin-top:2rem">All vacancies</h2>
+  <div class="card table-wrap" style="margin-top:1rem">
+    <table>
+      <thead><tr><th>Job</th><th>Company</th><th>Status</th><th>Posted</th></tr></thead>
+      <tbody>
+        <tr th:each="j : ${allJobs}">
+          <td><a th:href="@{/jobs/{id}(id=${j.id})}" th:text="${j.title}">Title</a></td>
+          <td th:text="${j.companyName}">Company</td>
+          <td><span class="pill" th:classappend="'pill-' + ${j.status.name().toLowerCase()}" th:text="${j.status.label}">Status</span></td>
+          <td class="muted" th:text="${#temporals.format(j.postedAt,'dd MMM yyyy')}">Date</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title th:text="${title} + ' · WorkWave'">WorkWave</title>
+  <!-- set the saved (or OS-preferred) theme before first paint -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('theme');
+        if (!t) { t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div th:fragment="navbar">
+  <header class="nav">
+    <div class="container nav-inner">
+      <a class="brand" th:href="@{/}"><span class="logo">W</span><span>Work<span class="grad">Wave</span></span></a>
+      <nav class="nav-links">
+        <a th:href="@{/}">Home</a>
+        <a th:href="@{/jobs}">Find jobs</a>
+        <a th:if="${currentUser != null and currentUser.role.name() == 'ADMIN'}" th:href="@{/admin/dashboard}">Admin panel</a>
+        <a th:if="${currentUser != null and currentUser.role.name() == 'EMPLOYER'}" th:href="@{/employer/dashboard}">My postings</a>
+        <a th:if="${currentUser != null and currentUser.role.name() == 'JOB_SEEKER'}" th:href="@{/seeker/dashboard}">My applications</a>
+      </nav>
+      <div class="nav-actions">
+        <button id="themeToggle" class="icon-btn" type="button" aria-label="Switch light/dark theme" title="Switch theme">
+          <span class="sun">☀️</span><span class="moon">🌙</span>
+        </button>
+        <th:block th:if="${currentUser == null}">
+          <a class="btn btn-ghost btn-sm" th:href="@{/login}">Log in</a>
+          <a class="btn btn-sm" th:href="@{/register}">Sign up</a>
+        </th:block>
+        <th:block th:if="${currentUser != null}">
+          <span class="hello" th:text="${currentUser.name}">Name</span>
+          <form class="inline" th:action="@{/logout}" method="post">
+            <button class="btn btn-ghost btn-sm" type="submit">Log out</button>
+          </form>
+        </th:block>
+      </div>
+    </div>
+  </header>
+  <div class="container flash">
+    <div class="alert success" th:if="${success}" th:text="${success}"></div>
+    <div class="alert error" th:if="${flashError}" th:text="${flashError}"></div>
+  </div>
+</div>
+
+<footer class="footer" th:fragment="footer">
+  <div class="container">© WorkWave · Post. Approve. Apply. Hire. &nbsp;|&nbsp; Built with Java &amp; Spring Boot</div>
+  <script th:src="@{/js/app.js}"></script>
+</footer>
+
+<article class="job-card" th:fragment="jobCard(job)">
+  <div class="job-head">
+    <div class="avatar" th:style="'--hue:' + ${job.employer.id * 47 % 360}"
+         th:text="${job.companyName.substring(0,1).toUpperCase()}">T</div>
+    <div>
+      <h3><a th:href="@{/jobs/{id}(id=${job.id})}" th:text="${job.title}">Job title</a></h3>
+      <p class="muted small" th:text="${job.companyName}">Company</p>
+    </div>
+    <span class="match" th:if="${matches != null and matches.containsKey(job.id)}"
+          th:text="${matches.get(job.id)} + '% match'">80% match</span>
+  </div>
+  <div class="meta">
+    <span th:text="'📍 ' + ${job.location}">📍 City</span>
+    <span th:text="'🕒 ' + ${job.jobType.label}">🕒 Full-time</span>
+    <span th:if="${!#strings.isEmpty(job.salary)}" th:text="'💰 ' + ${job.salary}">💰 Salary</span>
+  </div>
+  <div class="chips">
+    <span class="chip" th:each="s : ${job.skillList}" th:text="${s}">Skill</span>
+  </div>
+  <div class="job-foot">
+    <span class="muted small" th:text="'Posted ' + ${#temporals.format(job.postedAt,'dd MMM yyyy')}">Posted</span>
+    <a class="btn btn-sm" th:href="@{/jobs/{id}(id=${job.id})}">View &amp; apply →</a>
+  </div>
+</article>
+
+</body>
+</html>
